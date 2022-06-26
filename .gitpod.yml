@@ -5,8 +5,8 @@ tasks:
       ./gitpod-init.sh
   - command: |
       ./gitpod-command.sh
-      pyenv activate search_with_ml
-  - env:
+  - command: pyenv activate search_with_ml
+    env:
       FLASK_ENV: development
       PRIOR_CLICKS_LOC: /workspace/ltr_output/train.csv
       FLASK_APP: week2
