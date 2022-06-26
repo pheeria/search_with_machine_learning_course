@@ -12,3 +12,5 @@ cd docker
 docker-compose up -d
 
 cd /home/gitpod/fastText-0.9.2 && /usr/bin/make -f /home/gitpod/fastText-0.9.2/Makefile clean fasttext
+
+pyenv activate search_with_ml
