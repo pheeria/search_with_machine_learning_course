@@ -7,8 +7,7 @@ import requests
 import xgboost as xgb
 from opensearchpy import OpenSearch
 import matplotlib.pyplot as plt
-from xgboost import XGBClassifier
-from xgboost import plot_tree
+from xgboost import XGBClassifier, plot_tree
 
 #######################
 #
