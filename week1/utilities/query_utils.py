@@ -42,37 +42,33 @@ def create_prior_queries(doc_ids, doc_id_weights, query_times_seen): # total imp
 
 
 def create_simple_baseline(user_query, click_prior_query, filters, sort="_score", sortDir="desc", size=10, include_aggs=True, highlight=True, source=None):
-
     query_obj = {
         'size': size,
         "sort":[
             {sort: {"order": sortDir}}
         ],
         "query": {
-
             "bool": {
-                "must": [
-
-                ],
+                "must": [],
                 "should":[ #
                     {
-                      "match": {
+                        "match": {
                             "name": {
                                 "query": user_query,
                                 "fuzziness": "1",
                                 "prefix_length": 2, # short words are often acronyms or usually not misspelled, so don't edit
                                 "boost": 0.01
                             }
-                       }
+                        }
                     },
                     {
-                      "match_phrase": { # near exact phrase match
+                        "match_phrase": { # near exact phrase match
                             "name.hyphens": {
                                 "query": user_query,
                                 "slop": 1,
                                 "boost": 50
                             }
-                       }
+                        }
                     },
                     {
                       "multi_match": {
@@ -85,34 +81,33 @@ def create_simple_baseline(user_query, click_prior_query, filters, sort="_score"
                        }
                     },
                     {
-                      "terms":{ # Lots of SKUs in the query logs, boost by it, split on whitespace so we get a list
-                        "sku": user_query.split(),
-                        "boost": 50.0
-                      }
+                        "terms":{ # Lots of SKUs in the query logs, boost by it, split on whitespace so we get a list
+                            "sku": user_query.split(),
+                            "boost": 50.0
+                        }
                     },
                     { # lots of products have hyphens in them or other weird casing things like iPad
-                      "match": {
+                        "match": {
                             "name.hyphens": {
                                 "query": user_query,
                                 "operator": "OR",
                                 "minimum_should_match": "2<75%"
                             }
-                       }
+                        }
                     }
                 ],
                 "minimum_should_match": 1,
                 "filter": filters  #
             }
-
         }
     }
     if click_prior_query != "":
         query_obj["query"]["bool"]["should"].append({
-                        "query_string":{  # This may feel like cheating, but it's really not, esp. in ecommerce where you have all this prior data,  You just can't let the test clicks leak in, which is why we split on date
-                            "query": click_prior_query,
-                            "fields": ["_id"]
-                        }
-                    })
+            "query_string": {  # This may feel like cheating, but it's really not, esp. in ecommerce where you have all this prior data,  You just can't let the test clicks leak in, which is why we split on date
+                "query": click_prior_query,
+                "fields": ["_id"]
+            }
+        })
         #print(query_obj)
     if user_query == "*" or user_query == "#":
         #replace the bool
@@ -138,7 +133,6 @@ def create_simple_baseline(user_query, click_prior_query, filters, sort="_score"
 
 # Hardcoded query here.  Better to use search templates or other query config.
 def create_query(user_query, click_prior_query, filters, sort="_score", sortDir="desc", size=10, include_aggs=True, highlight=True, source=None):
-
     query_obj = {
         'size': size,
         "sort":[
@@ -148,53 +142,51 @@ def create_query(user_query, click_prior_query, filters, sort="_score", sortDir=
             "function_score": {
                 "query": {
                     "bool": {
-                        "must": [
-
-                        ],
+                        "must": [],
                         "should":[ #
                             {
-                              "match": {
+                                "match": {
                                     "name": {
                                         "query": user_query,
                                         "fuzziness": "1",
                                         "prefix_length": 2, # short words are often acronyms or usually not misspelled, so don't edit
                                         "boost": 0.01
                                     }
-                               }
+                                }
                             },
                             {
-                              "match_phrase": { # near exact phrase match
+                                "match_phrase": { # near exact phrase match
                                     "name.hyphens": {
                                         "query": user_query,
                                         "slop": 1,
                                         "boost": 50
                                     }
-                               }
+                                }
                             },
                             {
-                              "multi_match": {
+                                "multi_match": {
                                     "query": user_query,
                                     "type": "phrase",
                                     "slop": "6",
                                     "minimum_should_match": "2<75%",
                                     "fields": ["name^10", "name.hyphens^10", "shortDescription^5",
                                        "longDescription^5", "department^0.5", "sku", "manufacturer", "features", "categoryPath"]
-                               }
+                                }
                             },
                             {
-                              "terms":{ # Lots of SKUs in the query logs, boost by it, split on whitespace so we get a list
-                                "sku": user_query.split(),
-                                "boost": 50.0
-                              }
+                                "terms": { # Lots of SKUs in the query logs, boost by it, split on whitespace so we get a list
+                                    "sku": user_query.split(),
+                                    "boost": 50.0
+                                }
                             },
                             { # lots of products have hyphens in them or other weird casing things like iPad
-                              "match": {
+                                "match": {
                                     "name.hyphens": {
                                         "query": user_query,
                                         "operator": "OR",
                                         "minimum_should_match": "2<75%"
                                     }
-                               }
+                                }
                             }
                         ],
                         "minimum_should_match": 1,
@@ -249,17 +241,16 @@ def create_query(user_query, click_prior_query, filters, sort="_score", sortDir=
                         }
                     }
                 ]
-
             }
         }
     }
     if click_prior_query != "":
         query_obj["query"]["function_score"]["query"]["bool"]["should"].append({
-                        "query_string":{  # This may feel like cheating, but it's really not, esp. in ecommerce where you have all this prior data,  You just can't let the test clicks leak in, which is why we split on date
-                            "query": click_prior_query,
-                            "fields": ["_id"]
-                        }
-                    })
+            "query_string":{  # This may feel like cheating, but it's really not, esp. in ecommerce where you have all this prior data,  You just can't let the test clicks leak in, which is why we split on date
+                "query": click_prior_query,
+                "fields": ["_id"]
+            }
+        })
         #print(query_obj)
     if user_query == "*" or user_query == "#":
         #replace the bool
@@ -315,5 +306,4 @@ def add_aggs(query_obj):
                 }
             }
         }
-
     }
