@@ -76,3 +76,19 @@ LTR hand tuned p@10 is 0.180
 Simple better: 348  LTR_Simple Better: 565  Equal: 10
 HT better: 537      LTR_HT Better: 570      Equal: 18
 ```
+
+## Add sales rank
+
+```
+Simple MRR is 0.303
+LTR Simple MRR is 0.460
+Hand tuned MRR is 0.391
+LTR Hand Tuned MRR is 0.458
+
+Simple p@10 is 0.102
+LTR simple p@10 is 0.170
+Hand tuned p@10 is 0.157
+LTR hand tuned p@10 is 0.177
+Simple better: 511  LTR_Simple Better: 663  Equal: 11
+HT better: 621      LTR_HT Better: 672      Equal: 18
+```
