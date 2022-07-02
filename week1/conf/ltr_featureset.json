@@ -67,6 +67,51 @@
             }
           }
         }
+      },
+      {
+        "name": "artistName",
+        "params": [
+          "keywords"
+        ],
+        "template_language": "mustache",
+        "template": {
+          "match_phrase": {
+            "artistName": {
+              "query":"{{keywords}}",
+              "slop": 6
+            }
+          }
+        }
+      },
+      {
+        "name": "shortDescription",
+        "params": [
+          "keywords"
+        ],
+        "template_language": "mustache",
+        "template": {
+          "match_phrase": {
+            "shortDescription": {
+              "query":"{{keywords}}",
+              "slop": 6
+            }
+          }
+        }
+      },
+      {
+        "name": "longDescription",
+        "params": [
+          "keywords"
+        ],
+        "template_language": "mustache",
+        "template": {
+          "match_phrase": {
+            "longDescription": {
+              "query":"{{keywords}}",
+              "slop": 6
+            }
+          }
+        }
       }
     ]
   }

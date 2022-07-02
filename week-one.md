@@ -60,3 +60,19 @@ LTR hand tuned p@10 is 0.182
 Simple better: 480  LTR_Simple Better: 697  Equal: 10
 HT better: 676      LTR_HT Better: 640      Equal: 19
 ```
+
+## Add artist name, short and log descriptions
+
+```
+Simple MRR is 0.271
+LTR Simple MRR is 0.450
+Hand tuned MRR is 0.419
+LTR Hand Tuned MRR is 0.467
+
+Simple p@10 is 0.094
+LTR simple p@10 is 0.165
+Hand tuned p@10 is 0.203
+LTR hand tuned p@10 is 0.180
+Simple better: 348  LTR_Simple Better: 565  Equal: 10
+HT better: 537      LTR_HT Better: 570      Equal: 18
+```
