@@ -1,3 +1,39 @@
+# First week's project
+
+## Project Assessment
+> Do you understand the steps involved in creating and deploying an LTR model?  Name them and describe what each step does in your own words.
+
+1. Decide whether you need ML at all. Probably not for non-ecommerce businesses or similar, where search doesn't drive the income.
+2. Set up good tracking on queries, clicks, dwells, orders, filters and sorting.
+3. Set up ratings and reviews.
+4. Iteratively decide which features to rely on.
+5. 
+
+
+> What is a feature and featureset?
+
+Feature is a field of document, seen as a dimension in the vector space.
+Featureset is a set of features, an LTR model we train.
+
+> What is the difference between precision and recall?
+
+Precision and recall are conflicting forces, one usually coming at the cost of the other. Let me try to explain based on the food delivery industry.
+Generally, ecommerce wants to improve the recall. If somebody searches for `McDonald's` and we don't have them nearby, it is probably ok to suggest them `Burger King` (using query expansion and/or synonyms). However, if somebody wants `halal meat`, we better serve them `halal` results (using query classification). This increases precision, however narrows the search scope, impacting the recall negatively.
+
+> What are some of the traps associated with using click data in your model?
+
+If we don't have the data about the results that *were not* clicked, the models we train will become biased. We can/should also collect and include the data when the customer decides to apply filters/sorting, being not satisfied with the results. 
+
+> What are some of the ways we are faking our data and how would you prevent that in your application?
+
+> What is target leakage and why is it a bad thing?
+
+> When can using prior history cause problems in search and LTR?
+
+> Submit your project along with your best MRR scores
+
+My scores can be found in `week-one.md` in the repository: https://github.com/pheeria/search_with_machine_learning_course/blob/main/week-one.md 
+
 ## Initial approach
 
 ```
