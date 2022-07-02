@@ -244,7 +244,7 @@ class DataPrepper:
             feature_results["sku"].append(hit["_source"]["sku"][0])
             for ltr_log in hit["fields"]["_ltrlog"]:
                 for log in ltr_log["log_entry"]:
-                    if not feature_results[log["name"]]:
+                    if log["name"] not in feature_results:
                         feature_results[log["name"]] = []
                     
                     feature_results[log["name"]].append(log.get("value", 0))
