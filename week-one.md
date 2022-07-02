@@ -7,8 +7,11 @@
 2. Set up good tracking on queries, clicks, dwells, orders, filters and sorting.
 3. Set up ratings and reviews.
 4. Iteratively decide which features to rely on.
-5. 
-
+5. Gather judgements - either explicit by people or implicit by exploring the impressions.
+6. For each query - combine the impressions and logged feature scores.
+7. Train the model.
+8. Upload the model and AB test.
+9. Rinse, repeat.
 
 > What is a feature and featureset?
 
@@ -26,9 +29,17 @@ If we don't have the data about the results that *were not* clicked, the models 
 
 > What are some of the ways we are faking our data and how would you prevent that in your application?
 
+- Not to weight too high the ratings, if the rating count is low
+- Prevent bots from scraping and polluting the search queries
+- Catalog checks to prevent keyword pollution
+
 > What is target leakage and why is it a bad thing?
 
+If training set and test set have overlapping data, it will skew the model.
+
 > When can using prior history cause problems in search and LTR?
+
+If promotions like `HP touchpad` cause anomalies.
 
 > Submit your project along with your best MRR scores
 
