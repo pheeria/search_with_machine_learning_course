@@ -46,8 +46,7 @@ class DataPrepper:
 
 
     def create_splits(self, file_to_split, split_train, split_test, output_dir, train_rows, test_rows, verify_file):
-        print("Splitting: %s and writing train to: %s and test to: %s in %s" % (
-        file_to_split, split_train, split_test, output_dir))
+        print(f"Splitting: {file_to_split} and writing train to: {split_train} and test to: {split_test} in {output_dir}")
         input_df = pd.read_csv(file_to_split, parse_dates=['click_time', 'query_time'])
         #input_df = input_df.astype({'click_time': 'datetime64', 'query_time':'datetime64'})
         input_df = self.filter_junk_clicks(input_df, verify_file, output_dir)
@@ -179,8 +178,7 @@ class DataPrepper:
             "num_impressions": num_impressions,
             "product_name": product_names
         })
-        # remove low click/impressions,
-        #remove low click/impressions
+        # remove low click/impressions
         impressions_df = impressions_df[(impressions_df['num_impressions'] >= min_impressions) & (impressions_df['clicks'] >= min_clicks)]
 
         return impressions_df, query_ids_map
@@ -214,8 +212,8 @@ class DataPrepper:
         return features_df
 
     # Features look like:
-    # {'log_entry': [{'name': 'title_match',
-    #          'value': 7.221403},
+    # {'log_entry': [
+    #         {'name': 'title_match', 'value': 7.221403},
     #         {'name': 'shortDescription_match'},
     #         {'name': 'longDescription_match'},
     #         {'name': 'onsale_function', 'value': 0.0},

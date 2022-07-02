@@ -1,4 +1,6 @@
 import math
+
+
 # some helpful tools for dealing with queries
 def create_stats_query(aggs, extended=True):
     print("Creating stats query from %s" % aggs)
@@ -11,10 +13,12 @@ def create_stats_query(aggs, extended=True):
         agg_map[agg] = {stats_type: {"field": agg}}
     return agg_obj
 
+
 # expects clicks and impressions to be in the row
-def create_prior_queries_from_group(click_group): # total impressions isn't currently used, but it mayb worthwhile at some point
+def create_prior_queries_from_group(click_group): # total impressions isn't currently used, but it may be worthwhile at some point
     click_prior_query = ""
-    # Create a string that looks like:  "query": "1065813^100 OR 8371111^89", where the left side is the doc id and the right side is the weight.  In our case, the number of clicks a document received in the training set
+    # Create a string that looks like:  "query": "1065813^100 OR 8371111^89", where the left side is the doc id and the right side is the weight
+    # In our case, the number of clicks a document received in the training set
     if click_group is not None:
         for item in click_group.itertuples():
             try:
@@ -26,9 +30,10 @@ def create_prior_queries_from_group(click_group): # total impressions isn't curr
 
 
 # expects clicks from the raw click logs, so value_counts() are being passed in
-def create_prior_queries(doc_ids, doc_id_weights, query_times_seen): # total impressions isn't currently used, but it mayb worthwhile at some point
+def create_prior_queries(doc_ids, doc_id_weights, query_times_seen): # total impressions isn't currently used, but it may be worthwhile at some point
     click_prior_query = ""
-    # Create a string that looks like:  "query": "1065813^100 OR 8371111^89", where the left side is the doc id and the right side is the weight.  In our case, the number of clicks a document received in the training set
+    # Create a string that looks like:  "query": "1065813^100 OR 8371111^89", where the left side is the doc id and the right side is the weight
+    # In our case, the number of clicks a document received in the training set
     if doc_ids is not None and doc_id_weights is not None:
         for idx, doc in enumerate(doc_ids):
             try:
@@ -38,7 +43,6 @@ def create_prior_queries(doc_ids, doc_id_weights, query_times_seen): # total imp
             except KeyError as ke:
                 pass # nothing to do in this case, it just means we can't find priors for this doc
     return click_prior_query
-
 
 
 def create_simple_baseline(user_query, click_prior_query, filters, sort="_score", sortDir="desc", size=10, include_aggs=True, highlight=True, source=None):
@@ -130,6 +134,7 @@ def create_simple_baseline(user_query, click_prior_query, filters, sort="_score"
     if include_aggs:
         add_aggs(query_obj)
     return query_obj
+
 
 # Hardcoded query here.  Better to use search templates or other query config.
 def create_query(user_query, click_prior_query, filters, sort="_score", sortDir="desc", size=10, include_aggs=True, highlight=True, source=None):

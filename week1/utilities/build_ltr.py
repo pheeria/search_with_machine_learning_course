@@ -177,6 +177,7 @@ if __name__ == "__main__":
     ltr_model_path = urljoin(base_url, ltr_store_path)
     feat_name = args.featureset_name
     index_name = args.index
+
     # Prep our data
     data_prepper = dp.DataPrepper(opensearch, feat_name, index_name, ltr_store_name)
     if args.split_input:
@@ -190,7 +191,7 @@ if __name__ == "__main__":
         ltr.create_ltr_store(ltr_model_path, auth)
 
     all_clicks_df = None
-    # Load up all of our data and filter it to get rid of junk data (promo codes, SKUs that don't exist
+    # Load up all of our data and filter it to get rid of junk data (promo codes, SKUs that don't exist)
     if args.all_clicks:
         try:
             print("Loading all clicks from %s" % args.all_clicks)
@@ -202,7 +203,7 @@ if __name__ == "__main__":
             print(e)
             exit(2)
 
-    # uplaod the LTR featureset
+    # upload the LTR featureset
     if args.upload_featureset:
         featureset_path = urljoin(ltr_model_path + "/", "_featureset/{}".format(feat_name))
         print("Installing %s featureset at %s" % (args.featureset, featureset_path))
@@ -210,6 +211,7 @@ if __name__ == "__main__":
             the_feature_set = json.load(json_file)
             rsp = ltr.post_featureset(featureset_path, the_feature_set, auth)
             print("Featureset Creation: %s" % rsp)
+
     # Upload an LTR model
     if args.upload_ltr_model:
         # delete any old model first
@@ -260,17 +262,17 @@ if __name__ == "__main__":
                                                                                 query_ids_map,
                                                                                 min_impressions=args.min_impressions,
                                                                                 min_clicks=args.min_clicks)  # impressions as a Pandas DataFrame
-        print("Writing impressions to file: %s/%s" % (output_dir, args.impressions_file))
-        impressions_df.to_csv("%s/%s" % (output_dir, args.impressions_file), index=False)
+        print(f"Writing impressions to file: {output_dir}/{args.impressions_file}")
+        impressions_df.to_csv(f"{output_dir}/{args.impressions_file}", index=False)
         query_ids = query_ids_map
         # be sure to write out our query id map
-        with open("%s/%s" % (output_dir, args.query_ids), 'w') as qids:
+        with open(f"{output_dir}/{args.query_ids}", 'w') as qids:
             qids.write(json.dumps(query_ids_map))
 
     #####
     #
     # Given an --impressions_file, create an SVMRank formatted output file containing one row per query-doc-features-comments.
-    # Looping over impressions, this code issues queries to OpenSearch using the SLTR EXT function to extract LTR feaatures per every query-SKU pair
+    # Looping over impressions, this code issues queries to OpenSearch using the SLTR EXT function to extract LTR features per every query-SKU pair
     # It then optionally normalizes the data (we will not use this in class, but it's there for future use where we don't use XGB, since XGB doesn't need normalization since it's calculating splits)
     # We also apply any click models we've implemented to then assign a grade/relevance score for each and every row.  See click_models.py.
     # Click models can also optionally downsample to create a more balanced training set.
@@ -280,8 +282,8 @@ if __name__ == "__main__":
     #
     #####
     if args.create_xgb_training and args.impressions_file:
-        print("Loading impressions from %s/%s" % (output_dir, args.impressions_file))
-        impressions_df = pd.read_csv("%s/%s" % (output_dir, args.impressions_file))
+        print(f"Loading impressions from {output_dir}/{args.impressions_file}")
+        impressions_df = pd.read_csv(f"{output_dir}/{args.impressions_file}")
 
         if impressions_df is not None:
             # We need a map of normalize types for our features.  Would be nice if we could store this on the featureset
@@ -303,38 +305,36 @@ if __name__ == "__main__":
                     # Aggregations here returns the stats about our features, like min/max, std dev.  If we ever use
                     # https://elasticsearch-learning-to-rank.readthedocs.io/en/latest/training-models.html#creating-a-model-with-feature-normalization
                     # we will need these to be saved/looked up so that we can add the normalizers to the model
-                    (features_df, aggregations) = data_prepper.normalize_data(features_df, the_feature_set,
-                                                                              normalize_type_map)
+                    (features_df, aggregations) = data_prepper.normalize_data(features_df, the_feature_set, normalize_type_map)
                     # Write out the normalized DF
-                    features_df.to_csv("%s.normalized" % args.impressions_file)
+                    features_df.to_csv(f"{args.impressions_file}.normalized")
                 else:
                     aggregations = {}
                 # Join the features data to the impressions data
                 # drop the features_df doc_id, as it isn't needed anymore
                 features_df.drop("doc_id", axis=1, inplace=True)
-                features_df.to_csv("%s/features.csv" % output_dir)
+                features_df.to_csv(f"{output_dir}/features.csv")
                 # Merge our impressions with our features using a left join on query_id and sku
                 train_features_df = pd.merge(impressions_df, features_df, how="left", on=["query_id", "sku"])
                 train_features_df["doc_id"] = train_features_df["sku"]
                 # Apply any specified click model.
-                train_features_df = cm.apply_click_model(train_features_df, args.click_model,
-                                                         downsample=args.downsample)
+                train_features_df = cm.apply_click_model(train_features_df, args.click_model, downsample=args.downsample)
                 # Now write out in XGB/SVM Rank format
-                print("NAN counts: %s" % train_features_df.isna().any().count())
+                print(f"NAN counts: {train_features_df.isna().any().count()}")
                 train_features_df = train_features_df.fillna(0)
-                train_features_df = train_features_df.sample(frac=1)  # shuffle
-                train_features_df.to_csv("%s/training.xgb.csv" % output_dir)
-                ltr.write_training_file(train_features_df, "%s/training.xgb" % output_dir,
-                                        "%s/%s" % (output_dir, args.xgb_feat_map))
+                train_features_df = train_features_df.sample(frac=1) # shuffle
+                train_features_df.to_csv(f"{output_dir}/training.xgb.csv")
+                ltr.write_training_file(train_features_df, f"{output_dir}/training.xgb", f"{output_dir}/{args.xgb_feat_map}")
         else:
             print("Unable to create training file, no ranks/features data available.")
 
 
     #############
     #
-    # Train a model using XG Boost!  Taking in the training file (training.xgb by default) specified by --xgb,
+    # Train a model using XG Boost! Taking in the training file (training.xgb by default) specified by --xgb,
     # build a model by iterating --xgb_rounds using the --xgb_conf (see https://xgboost.readthedocs.io/en/stable/python/python_intro.html#setting-parameters)
-    # Once training is complete, dump out the model as JSON and in the OpenSearch LTR model format (which has weird escaping: https://elasticsearch-learning-to-rank.readthedocs.io/en/latest/training-models.html)
+    # Once training is complete, dump out the model as JSON and in the OpenSearch LTR model format
+    # (which has weird escaping: https://elasticsearch-learning-to-rank.readthedocs.io/en/latest/training-models.html)
     # Also save in XGB binary format.
     #
     #############
@@ -343,19 +343,17 @@ if __name__ == "__main__":
 
         bst, xgb_params = xgbu.train(args.xgb, args.xgb_rounds, args.xgb_conf)
         print("Dumping out model using feature map: %s" % args.xgb_feat_map)
-        model = bst.get_dump(fmap=("%s/%s" % (output_dir, args.xgb_feat_map)), dump_format='json')
+        model = bst.get_dump(fmap=f"{output_dir}/{args.xgb_feat_map}", dump_format='json')
         # Write out both the raw and the LTR ready model to disk
         # Create our metadata for uploading the model
         model_name = args.xgb_model_name
-        ltr.write_opensearch_ltr_model(model_name, model, "%s/%s" % (output_dir, args.xgb_model),
-                                       objective=xgb_params.get("objective", "reg:logistic"))
-        print("Saving XGB Binary model to %s/%s" % (output_dir, args.xgb_model))
-        bst.save_model("%s/%s" % (output_dir, args.xgb_model))
+        ltr.write_opensearch_ltr_model(model_name, model, f"{output_dir}/{args.xgb_model}", objective=xgb_params.get("objective", "reg:logistic"))
+        print(f"Saving XGB Binary model to {output_dir}/{args.xgb_model}")
+        bst.save_model(f"{output_dir}/{args.xgb_model}")
 
     # Output some useful XGB Plots using matplotlib: https://xgboost.readthedocs.io/en/stable/python/python_api.html#module-xgboost.plotting
     if args.xgb_plot:
-        xgbu.plots("%s/%s" % (output_dir, args.xgb_model), args.xgb_model_name,
-                   "%s/%s" % (output_dir, args.xgb_feat_map), output_dir)
+        xgbu.plots(f"{output_dir}/{args.xgb_model}", args.xgb_model_name, f"{output_dir}/{args.xgb_feat_map}", output_dir)
 
     ################
     #
@@ -381,30 +379,28 @@ if __name__ == "__main__":
         # DataFrame: query, doc, rank, type, miss, score, new
         results_df, no_results = su.evaluate_test_set(test_data, train_df, opensearch, args.xgb_model_name,
                                                       args.ltr_store, args.index, num_queries=args.xgb_test_num_queries,
-                                                      main_query_weight=args.xgb_main_query_weight, rescore_query_weight=args.xgb_rescore_query_weight
-                                                      )
-        print("Writing results of test to %s" % "%s/%s" % (output_dir, args.xgb_test_output))
-        results_df.to_csv("%s/%s" % (output_dir, args.xgb_test_output), index=False)
+                                                      main_query_weight=args.xgb_main_query_weight, rescore_query_weight=args.xgb_rescore_query_weight)
+        print(f"Writing results of test to {output_dir}/{args.xgb_test_output}")
+        results_df.to_csv(f"{output_dir}/{args.xgb_test_output}", index=False)
         no_results_df = pd.DataFrame(no_results)
-        no_results_df.to_csv("%s/%s.no_results" % (output_dir, args.xgb_test_output), index=False)
-        print("Meta:\nModel name: %s, Store Name: %s, Index: %s, Precision: %s \n" % (
-        args.xgb_model_name, args.ltr_store, args.index, 10))
+        no_results_df.to_csv(f"{output_dir}/{args.xgb_test_output}.no_results", index=False)
+        print(f"Meta:\nModel name: {args.xgb_model_name}, Store Name: {args.ltr_store}, Index: {args.index}, Precision: 10 \n")
         # do some comparisons
-        print("Zero results queries: %s\n\n" % no_results)
+        print(f"Zero results queries: {no_results}\n\n")
         new_queries_df = results_df[results_df["new"] == True]["query"].drop_duplicates()
-        new_queries_df.to_csv("%s/%s.new_queries" % (output_dir, args.xgb_test_output), index=False)
+        new_queries_df.to_csv(f"{output_dir}/{args.xgb_test_output}.new_queries", index=False)
 
     # Given the output of --xgb_test, output some useful info about things like MRR and Precision.  Also creates a number
     # of interesting join data frames that can be used to compare results.
     if args.analyze:
         pd.set_option('display.max_columns', None)
-        test_df = pd.read_csv("%s/test.csv" % output_dir, parse_dates=['click_time', 'query_time'])
-        train_df = pd.read_csv("%s/%s" % (output_dir, args.train_file), parse_dates=['click_time', 'query_time'])
+        test_df = pd.read_csv(f"{output_dir}/test.csv", parse_dates=['click_time', 'query_time'])
+        train_df = pd.read_csv(f"{output_dir}/{args.train_file}", parse_dates=['click_time', 'query_time'])
 
-        print("Analyzing results from %s/%s" % (output_dir, args.xgb_test_output))
-        results_df = pd.read_csv("%s/%s" % (output_dir, args.xgb_test_output))
-        no_results_df = pd.read_csv("%s/%s.no_results" % (output_dir, args.xgb_test_output))
-        new_queries_df = pd.read_csv("%s/%s.new_queries" % (output_dir, args.xgb_test_output))
+        print(f"Analyzing results from {output_dir}/{args.xgb_test_output}")
+        results_df = pd.read_csv(f"{output_dir}/{args.xgb_test_output}")
+        no_results_df = pd.read_csv(f"{output_dir}/{args.xgb_test_output}.no_results")
+        new_queries_df = pd.read_csv(f"{output_dir}/{args.xgb_test_output}.new_queries")
         su.analyze_results(results_df, no_results_df, new_queries_df, opensearch, args.index, args.xgb_model_name,
                            args.ltr_store, train_df, test_df, output_dir, precision=args.precision, analyze_explains=args.analyze_explains, max_explains=args.max_explains)
     # Given a query in --all_clicks, output to the screen all of the documents that matched this query.  Can be useful for debugging.
@@ -418,13 +414,13 @@ if __name__ == "__main__":
     if args.lookup_product:
         sku = args.lookup_product
         doc = su.lookup_product(sku, opensearch, index_name)
-        print("Retrieved doc:\n %s" % json.dumps(doc, indent=4))
+        print(f"Retrieved doc:\n {json.dumps(doc, indent=4)}")
         # opensearch.get(index_name, sku)
     # Loop through *ALL* unique SKUs from --all_clicks and validate they exist in the index by using the --lookup_product option to retrieve the document.
     # Outputs a data frame as CSV named validity.csv which tracks whether a SKU is in the index or not.  Can be used for filtering --all_clicks for training et. al.
     if args.verify_products:
         skus = all_clicks_df['sku'].drop_duplicates()
-        print("Verifying %s skus.  This may take a while" % len(skus))
+        print(f"Verifying {len(skus)} skus.  This may take a while")
         sku_tracker = []
         valid_tracker = []
         status = {"sku": sku_tracker, "status": valid_tracker}
@@ -436,6 +432,6 @@ if __name__ == "__main__":
             else:
                 valid_tracker.append(1)
         df = pd.DataFrame(status)
-        output_file = "%s/%s" % (output_dir, args.verify_file)
-        print("Writing results to %s" % output_file)
+        output_file = f"{output_dir}/{args.verify_file}"
+        print(f"Writing results to {output_file}")
         df.to_csv(output_file, index=False)
