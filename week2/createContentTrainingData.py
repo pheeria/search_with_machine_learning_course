@@ -6,10 +6,16 @@ import os
 import random
 import xml.etree.ElementTree as ET
 from pathlib import Path
+import re
 
-def transform_name(product_name):
-    # IMPLEMENT
-    return product_name
+NON_ALPHA = re.compile(r"[^a-zA-Z0-9_]")
+COMBINE_WHITESPACE = re.compile(r"\s+")
+
+def transform_name(product_name: str):
+    result = product_name.strip().lower()
+    result = NON_ALPHA.sub(" ", result)
+    result = COMBINE_WHITESPACE.sub(" ", result)
+    return result
 
 # Directory for product data
 directory = r'/workspace/datasets/product_data/products/'
