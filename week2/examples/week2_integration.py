@@ -50,7 +50,6 @@ index_body = {
                 }
             },
             "analyzer": {
-
                 "body_pos": {
                     "tokenizer": "whitespace",  # we can't use standard b/c it strips or delimiters
                     "filter": ["pos_filter", "lowercase"]  # put whatever else here
@@ -59,7 +58,6 @@ index_body = {
                     "tokenizer": "whitespace",  # we can't use standard b/c it strips or delimiters
                     "filter": ["lowercase"]  # put whatever else here
                 }
-
             }
         },
         'index': {
@@ -75,7 +73,6 @@ index_body = {
             "body_sentences": {"type": "text", "analyzer": "english"},
             # Notice the different search analyzer
             "body_pos": {"type": "text", "analyzer": "body_pos", "search_analyzer": "body_pos_search"},
-
             "body_ne": {"type": "text", "analyzer": "standard"},
             "in_stock": {"type": "boolean"},
             "category": {"type": "keyword", "ignore_above": "256"},
@@ -98,44 +95,48 @@ docs = [
         "body": "The greatest hockey player of all time is Wayne Gretzky. He holds a record for holding the most records!  Who else even comes close?",
         "price": "15.13",
         "in_stock": True,
-        "category": "sports"},
+        "category": "sports"
+    },
     {
         "id": "doc_a",
         "title": "Apple iPhone 13",
         "body": "The all new Apple iPhone 13 has 3 cameras and the fastest chip on the market.  The phone retails for $699 for 64GB of storage.",
         "price": "5.99",
         "in_stock": True,
-        "category": "childrens"},
-
+        "category": "childrens"
+    },
     {
         "id": "doc_c",
         "title": "Lead Paint Removal",
         "body": "All lead must be removed from the brown and red paint.  Use the Glidden Lead Paint Killer solvent to keep the paint, but remove the lead!",
         "price": "150.21",
         "in_stock": False,
-        "category": "instructional"},
+        "category": "instructional"
+    },
     {
         "id": "doc_d",
         "title": "The Three Little Pigs Revisted",
         "price": "3.51",
         "in_stock": True,
         "body": "The big, bad wolf huffed and puffed and blew the house down. The end.  Well, not quite.  It seems the pigs filed an injunction against the wolf and now the wolf has to pay restitution.",
-        "category": "childrens"},
+        "category": "childrens"
+    },
     {
         "id": "doc_e",
         "title": "Green apples and Spam",
         "price": "2.99",
         "in_stock": True,
         "body": "The little green apple fell from the tree.  It was not a bad apple, so no one could understand why it fell.",
-        "category": "childrens"},
+        "category": "childrens"
+    },
     {
         "id": "doc_f",
         "title": "Fun with Spans",
         "price": "4.99",
         "in_stock": True,
         "body": "Dan is the President. The United States Government has arrested him.",
-        "category": "childrens"}
-
+        "category": "childrens"
+    }
 ]
 
 #######################
