@@ -33,7 +33,7 @@ output_file = args.output
 path = Path(output_file)
 output_dir = path.parent
 if os.path.isdir(output_dir) == False:
-        os.mkdir(output_dir)
+    os.mkdir(output_dir)
 
 if args.input:
     directory = args.input
@@ -71,10 +71,9 @@ def _label_filename(filename):
 if __name__ == '__main__':
     files = glob.glob(f'{directory}/*.xml')
 
-    print("Writing results to %s" % output_file)
+    print(f"Writing results to {output_file}")
     with multiprocessing.Pool() as p:
         all_labels = tqdm(p.imap_unordered(_label_filename, files), total=len(files))
-
 
         with open(output_file, 'w') as output:
             for label_list in all_labels:
