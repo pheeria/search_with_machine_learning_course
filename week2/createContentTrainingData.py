@@ -7,6 +7,7 @@ import random
 import xml.etree.ElementTree as ET
 from pathlib import Path
 import re
+from collections import defaultdict
 
 NON_ALPHA = re.compile(r"[^a-zA-Z0-9_]")
 COMBINE_WHITESPACE = re.compile(r"\s+")
@@ -55,6 +56,7 @@ def _label_filename(filename):
     tree = ET.parse(filename)
     root = tree.getroot()
     labels = []
+
     for child in root:
         if random.random() > sample_rate:
             continue
@@ -64,14 +66,16 @@ def _label_filename(filename):
             child.find('categoryPath')[len(child.find('categoryPath')) - 1][0].text is not None and
             child.find('categoryPath')[0][0].text == 'cat00000' and
             child.find('categoryPath')[1][0].text != 'abcat0600000'):
-              # Choose last element in categoryPath as the leaf categoryId or name
-              if names_as_labels:
-                  cat = child.find('categoryPath')[len(child.find('categoryPath')) - 1][1].text.replace(' ', '_')
-              else:
-                  cat = child.find('categoryPath')[len(child.find('categoryPath')) - 1][0].text
-              # Replace newline chars with spaces so fastText doesn't complain
-              name = child.find('name').text.replace('\n', ' ')
-              labels.append((cat, transform_name(name)))
+            # Choose last element in categoryPath as the leaf categoryId or name
+            if names_as_labels:
+                category = child.find('categoryPath')[len(child.find('categoryPath')) - 1][1].text.replace(' ', '_')
+            else:
+                category = child.find('categoryPath')[len(child.find('categoryPath')) - 1][0].text
+            # Replace newline chars with spaces so fastText doesn't complain
+            name = child.find('name').text.replace('\n', ' ')
+            transformed_name = transform_name(name)
+            labels.append((category, transformed_name))
+
     return labels
 
 if __name__ == '__main__':
@@ -80,8 +84,14 @@ if __name__ == '__main__':
     print(f"Writing results to {output_file}")
     with multiprocessing.Pool() as p:
         all_labels = tqdm(p.imap_unordered(_label_filename, files), total=len(files))
+        categories = defaultdict(list)
+
+        for label_list in all_labels:
+            for (category, product) in label_list:
+                categories[category].append(product)
 
         with open(output_file, 'w') as output:
-            for label_list in all_labels:
-                for (cat, name) in label_list:
-                    output.write(f'__label__{cat} {name}\n')
+            for category, names in categories.items():
+                if len(names) > min_products:
+                    for name in names:
+                        output.write(f'__label__{category} {name}\n')
