@@ -48,16 +48,28 @@ I re-used the dataset generated for classification. So, lowercased, removed non-
 
 > a. How did you transform the product names (if different than previously)?
 
+Not different
+
 > b. What threshold score did you use?
+
+0.75
 
 > c. Were you able to find the additional results by matching synonyms?
 
+Yes, albeit not completely matching the expectations of the self checks.
+
+status | query | plain | with synonyms
+--- | --- | --- | ---
+expected | earbuds | ~1,000 | >2,000
+actual | earbuds | 1,205 | 3,360
+--- | --- | --- | ---
+expected | nespresso | 8 | >200
+actual | nespresso | 8 | 8
+--- | --- | --- | ---
+expected | dslr | ~800 | ~2,500
+actual | dslr | 2,837 | 4,445
+
+
 4. For classifying reviews:
 
-> a. What precision (P@1) were you able to achieve?
-
-> b. What fastText parameters did you use?
-
-> c. How did you transform the review content?
-
-> d. What else did you try and learn?
+Didn't do
