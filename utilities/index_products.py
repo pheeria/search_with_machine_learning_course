@@ -134,7 +134,7 @@ def index_file(file, index_name, documents_url="http://localhost:5000/documents/
 @click.option('--documents_url', '-d', default="http://localhost:5000/documents/annotate", help="The location of the Flask App endpoint, something like http://localhost:5000/documents/annotate")
 @click.option('--reduced', is_flag=True, show_default=True, default=False, help="Removes music, movies, and merchandised products.")
 def main(source_dir: str, index_name: str, reduced: bool, workers: int, documents_url: str):
-    logger.info(f"Indexing {source_dir} to {index_name} with {workers} workers, the reduced flag set to {reduced}. Documents URL is {documents_url}")
+    logger.info(f"Indexing {source_dir} to {index_name} with {workers} workers, the reduced flag set to {reduced}.  Documents URL is {documents_url}")
     files = glob.glob(source_dir + "/*.xml")
     docs_indexed = 0
     start = perf_counter()
