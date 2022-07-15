@@ -4,6 +4,7 @@ import xml.etree.ElementTree as ET
 import pandas as pd
 import numpy as np
 import csv
+import re
 
 # Useful if you want to perform stemming.
 import nltk
@@ -48,11 +49,21 @@ parents_df = pd.DataFrame(list(zip(categories, parents)), columns =['category', 
 df = pd.read_csv(queries_file_name)[['category', 'query']]
 df = df[df['category'].isin(categories)]
 
+NON_ALPHA = re.compile(r"[^a-zA-Z0-9_]")
+COMBINE_WHITESPACE = re.compile(r"\s+")
+
+def transform_name(query: str):
+    result = query.strip().lower()
+    result = NON_ALPHA.sub(" ", result)
+    result = COMBINE_WHITESPACE.sub(" ", result)
+    return result
+
 # IMPLEMENT ME: Convert queries to lowercase, and optionally implement other normalization, like stemming.
+df['query'] = df['query'].apply(transform_name)
 
 # IMPLEMENT ME: Roll up categories to ancestors to satisfy the minimum number of queries per category.
 
-# Create labels in fastText format.
+# # Create labels in fastText format.
 df['label'] = '__label__' + df['category']
 
 # Output labeled query data as a space-separated file, making sure that every category is in the taxonomy.
