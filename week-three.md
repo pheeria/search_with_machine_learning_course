@@ -12,6 +12,20 @@ For -epoch 25 -lr 0.5 -wordNgrams 2 >> R@1 0.52, R@3 0.7, R@5 0.769
 
 > 2a. For integrating query classification with search: Give 2 or 3 examples of queries where you saw a dramatic positive change in the results because of filtering. Make sure to include the classifier output for those queries.
 
+- `ipad`
+without classifier only 4 out 10 results are iPads, the rest are accesoires
+with category `pcmcat209000050007` all of the results are iPads
+
+- `xbox`
+without classifier only 1 out of 10 results is a console
+with category `abcat0701001` all of the results are consoles
 
 > 2b. For integrating query classification with search: Give 2 or 3 examples of queries where filtering hurt the results, either because the classifier was wrong or for some other reason. Again, include the classifier output for those queries.
 
+- `nintendo`
+without classifier 2 consoles and the rest are the games
+with category `abcat0715016` only accesoires
+
+- `powerbank`
+without classifier 2 power supplies and one battery case
+with category `abcat0811004` no results
